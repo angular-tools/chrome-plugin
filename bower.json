@@ -1,0 +1,22 @@
+{
+  "name": "chrome-plugin",
+  "authors": [
+    "Minute PHP <dev@minutephp.com>"
+  ],
+  "description": "Helper classes to write a chrome plugin",
+  "main": "js/background.js",
+  "moduleType": [],
+  "keywords": [
+    "chrome",
+    "plugin"
+  ],
+  "license": "MIT",
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
