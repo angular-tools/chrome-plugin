@@ -8,7 +8,7 @@ var Options = new function () {
         var Plugin = chrome.extension.getBackgroundPage().Plugin;
 
         if ($scope) {
-            var apply = function (f) {
+            var apply = function () {
                 if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
                     $scope.$apply();
                 }
