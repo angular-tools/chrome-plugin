@@ -1,5 +1,33 @@
 var Page = new function () {
-    this.init = function () {
+    /**
+     * Send message to background script
+     *
+     * @param {object} msgObj - Message object to pass
+     * @param {function} cb - response function
+     */
+    this.sendMessageToPlugin = function (msgObj, cb) {
+        chrome.runtime.sendMessage(msgObj, function (response) {
+            cb(response);
+        });
+    };
+
+    /**
+     * Get background page object
+     *
+     * @param {function} cb - function to return Plugin object
+     */
+
+    this.getPlugin = function (cb) {
+        Page.sendMessageToPlugin({_msg: "getPlugin"}, cb);
+    };
+
+    /**
+     * Init function
+     *
+     * @private
+     */
+
+    this._init = function () {
         if (chrome && chrome.runtime) {
             chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 if (message && (message._msg == 'getPage')) {
@@ -15,16 +43,5 @@ var Page = new function () {
         }
     };
 
-
-    this.sendMessageToPlugin = function (msgObj, cb) {
-        chrome.runtime.sendMessage(msgObj, function (response) {
-            cb(response);
-        });
-    };
-
-    this.getPlugin = function (cb) {
-        Page.sendMessageToPlugin({_msg: "getPlugin"}, cb);
-    };
-
-    this.init();
+    this._init();
 };
