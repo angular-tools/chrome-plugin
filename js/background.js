@@ -165,19 +165,19 @@ var Plugin = new function () {
      *
      * @param {string} key - The key
      * @param {function} cb - Function to return saved value
-     * @param {function} func - Function to calculate value when none is found
+     * @param {function|object} defaults - default value when none is found (closure allowed)
      * @param {boolean} fresh - Reset value with func's value
      */
-    this.get = function (key, cb, func, fresh) {
+    this.get = function (key, cb, defaults, fresh) {
         var setter = function () {
-            Plugin.set(key, func ? func() : null, cb);
+            Plugin.set(key, typeof(defaults) == 'function' ? defaults() : defaults, cb);
         };
 
         if (fresh) {
             setter();
         } else {
             chrome.storage.local.get(key, function (result) {
-                if (func && (!result || typeof(result[key]) == 'undefined')) {
+                if (defaults && (!result || typeof(result[key]) == 'undefined')) {
                     setter();
                 } else {
                     cb(result[key]);
