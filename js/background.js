@@ -20,7 +20,7 @@ var Plugin = new function () {
     this.getPage = function (cb, injections) {
         Plugin._sendMessageToPage({_msg: 'getPage'}, function (response) {
             if (response === undefined) {
-                Plugin.injectFilesInPage([].concat('src/common/page.js', 'src/page.js', injections || []), function (response) {
+                Plugin.injectFilesInPage([].concat('/src/bower_components/chrome-plugin/js/page.js', '/src/page.js', injections || []), function (response) {
                     Plugin.getPage(cb);
                 });
             } else {
