@@ -32,6 +32,20 @@ var Page = new function () {
             chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
                 if (message && (message._msg == 'getPage')) {
                     sendResponse(Page);
+                } else if (message && (message._msg == 'getSelection')) {
+                    var sel = window.getSelection();
+                    var html = '';
+
+                    if (sel.rangeCount) {
+                        var container = document.createElement("div");
+                        for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                            container.appendChild(sel.getRangeAt(i).cloneContents());
+                        }
+
+                        html = container.innerHTML;
+                    }
+
+                    sendResponse(html);
                 } else if (message && (message._msg == 'getHTML')) {
                     sendResponse(window.document.documentElement.outerHTML);
                 } else if (message && (message._msg == 'getURL')) {

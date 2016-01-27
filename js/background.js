@@ -20,7 +20,7 @@ var Plugin = new function () {
     this.getPage = function (cb, injections) {
         Plugin._sendMessageToPage({_msg: 'getPage'}, function (response) {
             if (response === undefined) {
-                Plugin.injectFilesInPage([].concat('/src/bower_components/chrome-plugin/js/page.js', '/src/page.js', injections || []), function (response) {
+                Plugin.injectFilesInPage([].concat('/src/bower_components/chrome-plugin/js/page.js', '/src/js/page.js', injections || []), function (response) {
                     Plugin.getPage(cb);
                 });
             } else {
@@ -29,6 +29,15 @@ var Plugin = new function () {
                 }
             }
         });
+    };
+
+    /**
+     * Get the current Page's selection HTML code
+     *
+     * @param {function} cb - callback function when Page selection HTML is found
+     */
+    this.getPageSelectedHTML = function (cb) {
+        Plugin.queryPage('getSelection', cb);
     };
 
     /**
@@ -146,7 +155,7 @@ var Plugin = new function () {
      * @private
      */
     this._sendMessageToPage = function (msgObj, cb, config) {
-        chrome.tabs.query(config || {"status": "complete", "windowId": chrome.windows.WINDOW_ID_CURRENT, "active": true}, function (tabs) {
+        chrome.tabs.query(config || {"windowId": chrome.windows.WINDOW_ID_CURRENT, "active": true}, function (tabs) {
             for (var i = 0; i < tabs.length; i++) {
                 (function (tab) {
                     //console.log("tab: ", tab);
@@ -200,6 +209,21 @@ var Plugin = new function () {
     };
 
     /**
+     * Global data shared between background page and popup (closing popup does not delete data)
+     * (Popup also sets a _refresh function internally)
+     *
+     * @param {string} key
+     * @param {object} value
+     */
+    this.setData = function (key, value) {
+        Plugin.data[key] = value;
+
+        if (typeof(Plugin._refresh) == 'function') {
+            Plugin._refresh();
+        }
+    };
+
+    /**
      * Init function
      *
      * @private
@@ -217,7 +241,6 @@ var Plugin = new function () {
 
             if (chrome.runtime) {
                 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-                    //console.log("message: ", message);
                     if (message && (message._msg == 'getPlugin')) {
                         sendResponse(Plugin);
                     } else if (typeof(onMessage) != 'undefined') {

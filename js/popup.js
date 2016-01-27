@@ -2,10 +2,34 @@ var Popup = new function () {
     /**
      * Get the Plugin object (from background script)
      *
-     * @returns {Plugin}
+     * @param {function} cb - callback to return with Plugin object
+     * @param {object} $scope - angular $scope to extend (optional)
+     *
      */
-    this.getPlugin = function () {
-        return chrome.extension.getBackgroundPage().Plugin;
+    this.getPlugin = function (cb, $scope) {
+        chrome.runtime.getBackgroundPage(function (background) {
+            var Plugin = background.Plugin;
+
+            if ($scope) {
+                $scope.data = Plugin.data;
+
+                Plugin._refresh = function () {
+                    try {
+                        if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+                            $scope.$apply();
+                        }
+                    } catch (e) {
+                    }
+                };
+
+                Plugin.get('options', function (options) {
+                    $scope.options = options || {};
+                    Plugin._refresh();
+                }, {}, false);
+            }
+
+            cb(Plugin);
+        });
     };
 
     /**
