@@ -205,7 +205,12 @@ var Plugin = new function () {
     this.set = function (key, value, cb) {
         var obj = {};
         obj[key] = value;
-        chrome.storage.local.set(obj, function () {cb(value)});
+
+        chrome.storage.local.set(obj, function () {
+            if (cb) {
+                cb(value);
+            }
+        });
     };
 
     /**
@@ -217,9 +222,27 @@ var Plugin = new function () {
      */
     this.setData = function (key, value) {
         Plugin.data[key] = value;
+        Plugin.set('data', Plugin.data);
 
         if (typeof(Plugin._refresh) == 'function') {
             Plugin._refresh();
+        }
+    };
+
+
+    /**
+     * Call a function
+     * Plugin._call(func, arg1, arg2, arg3, ...)
+     *
+     * @private
+     */
+    this._call = function (func) {
+        if (arguments.length > 0) {
+            var args = Array.prototype.slice.call(arguments, 1);
+
+            if (typeof(func) == 'function') {
+                func.call(Plugin, args);
+            }
         }
     };
 

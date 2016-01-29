@@ -11,7 +11,7 @@ var Popup = new function () {
             var Plugin = background.Plugin;
 
             if ($scope) {
-                $scope.data = Plugin.data;
+                $scope.data = Plugin.data || {};
 
                 Plugin._refresh = function () {
                     try {
@@ -26,6 +26,12 @@ var Popup = new function () {
                     $scope.options = options || {};
                     Plugin._refresh();
                 }, {}, false);
+
+                Plugin.get('data', function (data) {
+                    //console.log("data: ", data);
+                    Plugin.data = $scope.data = data || {};
+                    Plugin._refresh();
+                });
             }
 
             cb(Plugin);
